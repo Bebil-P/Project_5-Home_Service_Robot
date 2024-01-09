@@ -1,0 +1,10 @@
+<launch>
+
+ 
+  
+   <!-- Add marker with 5 sec timer -->
+  <node name="add_marker1" type="add_marker1" pkg="add_markers" output="screen">
+  </node>
+  
+</launch>
+

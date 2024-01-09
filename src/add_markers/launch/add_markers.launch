@@ -1,0 +1,9 @@
+<launch>
+
+ <!-- The drive_bot node -->
+  <node name="add_markers" type="add_markers" pkg="add_markers" output="screen">
+  </node>
+  
+  
+</launch>
+

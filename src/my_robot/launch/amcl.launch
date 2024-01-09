@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- map server node -->
+      <arg name="map_file" default="$(find my_robot)/maps/myworld2.yaml"/>
+      <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+
+<!-- AMCL Node -->
+  
+    <node name="amcl" pkg="amcl" type="amcl" output="screen">
+  
+    <!-- <remap from="scan" to="my_robot/laser/scan"/> -->
+        <remap from="scan" to="/scan"/>
+
+        <param name="odom_frame_id" value="odom"/>
+        <param name="odom_model_type" value="diff-corrected"/>
+        <param name="base_frame_id" value="robot_footprint"/>
+        <param name="global_frame_id" value="map"/>
+  
+  
+        <param name="initial_pose_x" value="0"/> 
+        <param name="initial_pose_y" value="0"/> 
+    <!-- Initial pose mean (yaw), used to initialize filter with Gaussian distribution -->
+        <param name="initial_pose_a" value="-1.57079"/> 
+    
+        
+    <!-- ~min_particles (int, default: 100)-->
+    <!-- Minimum allowed number of particles.-->
+        <param name = "min_particles" value = "50"/>
+
+    <!-- ~max_particles (int, default: 5000) -->
+    <!-- Maximum allowed number of particles. -->      
+        <param name = "max_particles" value = "1500"/>
+        
+    <!--~kld_err (double, default: 0.01)
+    Maximum error between the true distribution and the estimated distribution.-->
+        <param name = "kld_err" value = ".2"/>
+        
+    <!-- Translational and rotational movement required before performing a filter update
+         min distance = d and radians = a -->
+        <param name = "update_min_d" value = "0.2"/>
+        <param name = "update_min_a" value = "π/12.0"/>
+        
+        
+    <!-- ~recovery_alpha_slow (double, default: 0.0 (disabled))
+         ~recovery_alpha_fast (double, default: 0.0 (disabled))
+        Exponential decay rate for the slow average weight filter, used in deciding when to recover by adding   random poses. A good value for slow = 0.001 & for fast = 0.1-->
+        
+         <param name = "recovery_alpha_slow" value = "0.001"/>
+         <param name = "recovery_alpha_fast" value = "0.1"/>
+ 
+
+    <!-- Lawer likelihood_field  -->
+    
+    <!-- Minimum scan range to be considered; -1.0 will cause the laser's reported minimum range to be used.-->
+        <param name = "laser_min_range" value = "-1.0"/>
+    
+    <!-- Maximum scan range to be considered; -1.0 will cause the laser's reported maximum range to be used.-->
+        <param name = "laser_max_range" value = "10.0"/>
+
+    <!-- How many evenly-spaced beams in each scan to be used when updating the filter.-->
+    <!-- ~laser_max_beams (int, default: 30)-->
+        <param name = "laser_max_beams" value = "300"/>
+
+    <!-- Mixture weight for the z_hit part of the model.-->
+    <!-- ~laser_z_hit (double, default: 0.95)-->
+        <param name = "laser_z_hit" value = "0.95"/>
+
+
+    <!--Mixture weight for the z_short part of the model.-->
+    <!-- ~laser_z_short (double, default: 0.1)-->
+        <param name = "laser_z_short" value = "0.1"/>
+        
+    <!--Mixture weight for the z_max part of the model.-->
+    <!-- ~laser_z_max (double, default: 0.05)-->
+        <param name = "laser_z_max" value = "0.05"/>
+        
+
+    <!--Mixture weight for the z_rand part of the model.-->
+    <!-- ~laser_z_rand (double, default: 0.05)-->
+        <param name = "laser_z_rand" value = "0.05"/> 
+ 
+ 
+    <!-- Odometry model parameters-->
+    
+    <!-- Which model to use, either "diff", "omni", "diff-corrected" or "omni-corrected".-->
+    <!-- ~odom_model_type (string, default: "diff")-->
+    <param name = "odom_model_type" value = "diff"/>
+    
+    
+    <!--~odom_alpha1 (double, default: 0.2)
+    Specifies the expected noise in odometry's rotation estimate from the rotational component of the robot's   motion.-->
+    <param name = "odom_alpha1" value = "0.5"/>
+
+    <!-- ~odom_alpha2 (double, default: 0.2)
+    Specifies the expected noise in odometry's rotation estimate from translational component of the robot's motion.-->
+    <param name = "odom_alpha2" value = "0.5"/>
+
+    <!--~odom_alpha3 (double, default: 0.2)
+    Specifies the expected noise in odometry's translation estimate from the translational component of the robot's motion.-->
+    <param name = "odom_alpha3" value = "0.5"/>
+
+    <!--~odom_alpha4 (double, default: 0.2)
+    Specifies the expected noise in odometry's translation estimate from the rotational component of the robot's motion.-->
+    <param name = "odom_alpha4" value = "0.5"/>
+
+ 
+ 
+</node>
+  
+<!-- Move Base -->
+  
+    <node name="move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
+  
+        <!-- <remap from="scan" to="my_robot/laser/scan"/> -->
+        <remap from="scan" to="/scan"/>
+  
+        <param name="base_global_planner" value="navfn/NavfnROS" />
+        <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+        <rosparam file="$(find my_robot)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find my_robot)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find my_robot)/config/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find my_robot)/config/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find my_robot)/config/base_local_planner_params.yaml" command="load" />
+  
+    </node>
+
+
+</launch>
